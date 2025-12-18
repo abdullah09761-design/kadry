@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Library Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <div class="header-content">
+                <i class="fas fa-book-open header-icon"></i>
+                <h1>Book Library Manager</h1>
+                <p class="header-subtitle">Manage your personal book collection</p>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <section class="add-book-section card">
+                <h2><i class="fas fa-plus-circle"></i> Add New Book</h2>
+                <form id="addBookForm" class="book-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="title"><i class="fas fa-heading"></i> Title *</label>
+                            <input type="text" id="title" required placeholder="Enter book title">
+                        </div>
+                        <div class="form-group">
+                            <label for="author"><i class="fas fa-user-pen"></i> Author *</label>
+                            <input type="text" id="author" required placeholder="Enter author name">
+                        </div>
+                        <div class="form-group">
+                            <label for="category"><i class="fas fa-tag"></i> Category</label>
+                            <select id="category">
+                                <option value="Fiction">Fiction</option>
+                                <option value="Non-Fiction">Non-Fiction</option>
+                                <option value="Science">Science</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Biography">Biography</option>
+                                <option value="History">History</option>
+                                <option value="Fantasy">Fantasy</option>
+                                <option value="Mystery">Mystery</option>
+                                <option value="Romance">Romance</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-book-medical"></i> Add Book
+                        </button>
+                        <button type="button" id="cancelEdit" class="btn btn-secondary hidden">
+                            <i class="fas fa-times"></i> Cancel Edit
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="search-section card">
+                <h2><i class="fas fa-search"></i> Search Books</h2>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search books by title...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </section>
+
+            <section class="books-section card">
+                <div class="section-header">
+                    <h2><i class="fas fa-books"></i> Your Library</h2>
+                    <div class="book-count" id="bookCount">Loading...</div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="books-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Category</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="booksTableBody">
+                            <!-- Books will be loaded here dynamically -->
+                            <tr id="loadingRow">
+                                <td colspan="4" class="loading-cell">
+                                    <div class="loading-spinner"></div>
+                                    <p>Loading books...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="noBooksMessage" class="no-books-message hidden">
+                    <i class="fas fa-book"></i>
+                    <h3>No books found</h3>
+                    <p>Add your first book using the form above!</p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>Book Library Manager &copy; <span id="currentYear"></span> | Built with Supabase</p>
+            <p class="footer-note">Add your Supabase URL and Key in script.js to get started</p>
+        </footer>
+    </div>
+
+    <!-- Modal for editing books -->
+    <div id="editModal" class="modal hidden">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Edit Book</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="editBookForm" class="book-form">
+                <input type="hidden" id="editBookId">
+                <div class="form-group">
+                    <label for="editTitle">Title *</label>
+                    <input type="text" id="editTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="editAuthor">Author *</label>
+                    <input type="text" id="editAuthor" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCategory">Category</label>
+                    <select id="editCategory">
+                        <option value="Fiction">Fiction</option>
+                        <option value="Non-Fiction">Non-Fiction</option>
+                        <option value="Science">Science</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Biography">Biography</option>
+                        <option value="History">History</option>
+                        <option value="Fantasy">Fantasy</option>
+                        <option value="Mystery">Mystery</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <button type="button" class="btn btn-secondary close-modal">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal for Delete -->
+    <div id="deleteModal" class="modal hidden">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h2><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the book <strong id="bookToDeleteTitle"></strong>?</p>
+                <p>This action cannot be undone.</p>
+            </div>
+            <div class="modal-actions">
+                <button id="confirmDelete" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete Book
+                </button>
+                <button type="button" class="btn btn-secondary close-modal">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+</html>
